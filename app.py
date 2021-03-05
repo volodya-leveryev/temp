@@ -31,4 +31,5 @@ def shutdown_session(_=None):
     db_session.remove()
 
 
-app.run()
+if __name__ == '__main__':
+    app.run()
