@@ -1,6 +1,7 @@
 import pytest
 
-from app import app, db, Book
+from fiit1 import create_app, db
+from fiit1.models import Book
 
 
 AUTHOR = 'Александр Пушкин'
@@ -9,6 +10,7 @@ TITLE = 'Евгений Онегин'
 
 @pytest.fixture
 def client():
+    app = create_app()
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'
 
@@ -18,10 +20,12 @@ def client():
             db.create_all()
             db.session.add(b)
             db.session.commit()
+
         yield client
 
-    db.session.remove()
-    db.drop_all()
+        with app.app_context():
+            db.session.remove()
+            db.drop_all()
 
 
 def test_get_all(client):
