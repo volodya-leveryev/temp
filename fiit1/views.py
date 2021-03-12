@@ -1,31 +1,37 @@
-from flask import jsonify, request
+from flask_restful import Resource, reqparse
 
-from fiit1 import db
-from fiit1.models import Book
+from fiit1 import db, models
+
+parser = reqparse.RequestParser()
+parser.add_argument('author')
+parser.add_argument('title')
 
 
-def books(book_id=None):
-    if request.method == 'POST':
-        o = request.get_json()
-        b = Book(o['title'], o['author'])
+class BookList(Resource):
+    def get(self):
+        return [{'title': b.title, 'author': b.author} for b in models.Book.query.all()]
+
+    def post(self):
+        o = parser.parse_args()
+        b = models.Book(o['title'], o['author'])
         db.session.add(b)
         db.session.commit()
-        return jsonify(success=1)
-    elif request.method == 'PUT':
-        o = request.get_json()
-        b = Book.query.get(book_id)
-        b.title = o.get('title')
-        b.author = o.get('author')
-        db.session.add(b)
-        db.session.commit()
-        return jsonify(success=1)
-    else:
-        if book_id is not None and 0 < book_id:
-            b = Book.query.filter(Book.id == book_id).first()
-            if b:
-                return jsonify({'title': b.title, 'author': b.author})
-            else:
-                return jsonify(success=0)
+        return {'success': 1}
+
+
+class Book(Resource):
+    def get(self, book_id):
+        b = models.Book.query.get(book_id)
+        if b is None:
+            return {'success': 0}
         else:
-            b = [{'title': b.title, 'author': b.author} for b in Book.query.all()]
-            return jsonify(b)
+            return {'title': b.title, 'author': b.author}
+
+    def put(self, book_id):
+        o = parser.parse_args()
+        b = models.Book.query.get(book_id)
+        b.author = o['author']
+        b.title = o['title']
+        db.session.add(b)
+        db.session.commit()
+        return {'success': 1}

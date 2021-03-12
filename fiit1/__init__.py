@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -15,7 +16,8 @@ def create_app():
     db.init_app(app)
 
     from fiit1 import views
-    app.add_url_rule('/', 'book', views.books, methods=['GET', 'POST'])
-    app.add_url_rule('/<int:book_id>/', 'book', views.books, methods=['GET', 'PUT'])
+    api = Api(app)
+    api.add_resource(views.BookList, '/')
+    api.add_resource(views.Book, '/<int:book_id>/')
 
     return app

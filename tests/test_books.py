@@ -1,7 +1,6 @@
 import pytest
 
-from fiit1 import create_app, db
-from fiit1.models import Book
+from fiit1 import create_app, db, models
 
 
 AUTHOR = 'Александр Пушкин'
@@ -16,7 +15,7 @@ def client():
 
     with app.test_client() as client:
         with app.app_context():
-            b = Book(title=TITLE, author=AUTHOR)
+            b = models.Book(title=TITLE, author=AUTHOR)
             db.create_all()
             db.session.add(b)
             db.session.commit()
