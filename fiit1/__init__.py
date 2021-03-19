@@ -1,8 +1,16 @@
 from flask import Flask
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 from flask_restful import Api
-from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
+from fiit1.models import db, Book
+
+
+class BookAdmin(ModelView):
+    column_labels = {
+        'title': 'Название',
+        'author': 'Автор',
+    }
 
 
 def init_db():
@@ -14,6 +22,9 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
+
+    admin = Admin(app)
+    admin.add_view(BookAdmin(Book, db.session))
 
     from fiit1 import views
     api = Api(app)

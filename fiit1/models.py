@@ -1,4 +1,6 @@
-from fiit1 import db
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 
 class Book(db.Model):
