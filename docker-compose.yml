@@ -1,0 +1,12 @@
+version: 3.8
+services:
+  proxy:
+    image: nginx:stable
+    volumes:
+      - nginx.conf:/etc/nginx/temp.conf
+  web:
+    build: .
+    ports:
+      - 8000:8000
+    volumes:
+      - fiit1/test.db:/myapp/fiit1/test.db
