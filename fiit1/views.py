@@ -9,11 +9,12 @@ parser.add_argument('title')
 
 class BookList(Resource):
     def get(self):
-        return [{'title': b.title, 'author': b.author} for b in models.Book.query.all()]
+        return [{'title': b.title, 'author': b.author2_id} for b in models.Book.query.all()]
 
     def post(self):
         o = parser.parse_args()
-        b = models.Book(o['title'], o['author'])
+        b = models.Book(title=o['title'])
+        b.author2 = models.Author.query.get(o['author'])
         db.session.add(b)
         db.session.commit()
         return {'success': 1}
@@ -25,7 +26,7 @@ class Book(Resource):
         if b is None:
             return {'success': 0}
         else:
-            return {'title': b.title, 'author': b.author}
+            return {'title': b.title, 'author': b.author2_id}
 
     def put(self, book_id):
         o = parser.parse_args()
@@ -36,4 +37,8 @@ class Book(Resource):
         db.session.commit()
         return {'success': 1}
 
-    # TODO: implement DELETE
+    def delete(self, book_id):
+        b = models.Book.query.get(book_id)
+        db.session.delete(b)
+        db.session.commit()
+        return {'success': 1}

@@ -6,6 +6,7 @@ venv/
 
 # Databases
 *.db
+migrations/
 
 # Config files
 *.cfg
