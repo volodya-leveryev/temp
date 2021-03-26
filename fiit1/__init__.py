@@ -13,14 +13,9 @@ class BookAdmin(ModelView):
     }
 
 
-def init_db():
-    db.create_all()
-
-
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config.from_envvar('APP_CONFIG')
     db.init_app(app)
 
     admin = Admin(app)

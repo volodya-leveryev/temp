@@ -35,3 +35,5 @@ class Book(Resource):
         db.session.add(b)
         db.session.commit()
         return {'success': 1}
+
+    # TODO: implement DELETE
