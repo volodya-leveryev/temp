@@ -6,7 +6,7 @@ from flask_migrate import Migrate
 from flask_restful import Api
 
 from fiit1.models import db, Author, Book
-from fiit1.views import login, BookList, BookResource
+from fiit1.views import login, BookList, BookResource, static_file
 
 
 class BookAdmin(ModelView):
@@ -23,6 +23,8 @@ def create_app():
     Migrate(app, db, render_as_batch=True)
     JWTManager(app)
 
+    app.add_url_rule('/', view_func=static_file)
+    app.add_url_rule('/<path:filename>', view_func=static_file)
     app.add_url_rule('/login/', view_func=login, methods=['POST'])
 
     admin = Admin(app)

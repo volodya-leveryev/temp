@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, send_from_directory
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_restful import Resource, reqparse
 
@@ -8,6 +8,10 @@ from fiit1.models import User
 parser = reqparse.RequestParser()
 parser.add_argument('author')
 parser.add_argument('title')
+
+
+def static_file(filename='index.html'):
+    return send_from_directory('static', filename)
 
 
 def login():
