@@ -1,3 +1,6 @@
+import hashlib
+import os
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 
@@ -11,6 +14,23 @@ metadata = MetaData(
     }
 )
 db = SQLAlchemy(metadata=metadata)
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(32), index=True)
+    password_salt = db.Column(db.String(32))
+    password_hash = db.Column(db.String(64))
+
+    def hash_password(self, password: str):
+        """ Создание хеша от пароля """
+        self.password_salt = os.urandom(32)
+        self.password_hash = hashlib.scrypt(password.encode('utf-8'), salt=self.password_salt, n=16384, r=8, p=1)
+
+    def verify_password(self, password):
+        """ Проверка, что пароль соответствует хешу """
+        hash = hashlib.scrypt(password.encode('utf-8'), salt=self.password_salt, n=16384, r=8, p=1)
+        return self.password_hash == hash
 
 
 class Book(db.Model):

@@ -1,10 +1,12 @@
 from flask import Flask
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_restful import Api
 
 from fiit1.models import db, Author, Book
+from fiit1.views import login, BookList, BookResource
 
 
 class BookAdmin(ModelView):
@@ -19,14 +21,16 @@ def create_app():
     app.config.from_envvar('APP_CONFIG')
     db.init_app(app)
     Migrate(app, db, render_as_batch=True)
+    JWTManager(app)
+
+    app.add_url_rule('/login/', view_func=login, methods=['POST'])
 
     admin = Admin(app)
     admin.add_view(BookAdmin(Book, db.session))
     admin.add_view(ModelView(Author, db.session))
 
-    from fiit1 import views
     api = Api(app)
-    api.add_resource(views.BookList, '/')
-    api.add_resource(views.Book, '/<int:book_id>/')
+    api.add_resource(BookList, '/book/')
+    api.add_resource(BookResource, '/book/<int:book_id>/')
 
     return app

@@ -1,13 +1,31 @@
+from flask import request, jsonify
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_restful import Resource, reqparse
 
 from fiit1 import db, models
+from fiit1.models import User
 
 parser = reqparse.RequestParser()
 parser.add_argument('author')
 parser.add_argument('title')
 
 
+def login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    if username is None or password is None:
+        return jsonify({'success': False}), 401
+    user = User.query.filter_by(username=username).first()
+    if user is None or not user.verify_password(password):
+        return jsonify({'success': False}), 401
+    return jsonify({
+        'success': True,
+        'token': create_access_token(identity=username)
+    }), 200
+
+
 class BookList(Resource):
+    @jwt_required()
     def get(self):
         return [{'title': b.title, 'author': b.author2_id} for b in models.Book.query.all()]
 
@@ -20,7 +38,7 @@ class BookList(Resource):
         return {'success': 1}
 
 
-class Book(Resource):
+class BookResource(Resource):
     def get(self, book_id):
         b = models.Book.query.get(book_id)
         if b is None:
